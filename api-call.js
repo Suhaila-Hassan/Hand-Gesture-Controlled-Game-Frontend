@@ -1,12 +1,19 @@
-async function getPredictedLabel(processed_t) {
-  // TODO: Call your model's api here
-  // and return the predicted label
-  // Possible labels: "up", "down", "left", "right", null
-  // null means stop & wait for the next gesture
-  // For now, we will return a random label
-  const labels = ["up", "down", "left", "right"];
-  const randomIndex = Math.floor(Math.random() * labels.length);
-  const randomLabel = labels[randomIndex];
-  console.log("Predicted label:", randomLabel);
-  return randomLabel;
+async function getPredictedLabel(landmarks) {
+  const landmarkData = landmarks.map(({ x, y }) => [x, y]);
+
+  try {
+    const response = await fetch("http://localhost:8000/predict", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ landmarks: landmarkData }),
+    });
+
+    const data = await response.json();
+    return data.label;
+  } catch (error) {
+    console.error("API error:", error);
+    return null;
+  }
 }
